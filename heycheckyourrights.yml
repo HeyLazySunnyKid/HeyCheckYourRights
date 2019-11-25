@@ -35,7 +35,7 @@
   gather_facts: false
   tasks:
     - name: update host place in inventory file
-      command: "python3 up_inv.py {{ hostvars[item].inventory_file }} {{ item }} {{ hostvars[item].available }} {{ hostvars[item].reachable }} {{ hostvars[item].admin_user }}"
+      command: "python3 extra/up_inv.py {{ hostvars[item].inventory_file }} {{ item }} {{ hostvars[item].available }} {{ hostvars[item].reachable }} {{ hostvars[item].admin_user }}"
       when: hostvars[item].available is defined and hostvars[item].reachable is defined
       loop: "{{ groups.all }}"
       loop_control:
