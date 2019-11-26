@@ -1,0 +1,37 @@
+#!/bin/bash
+
+read -r -d '' HELP_MSG <<- EOM
+heycheckyourrights [inventory] [--limit group]
+
+DESCRIPTION
+    heycheckyourrights is a program for groups hosts in your inventory files.
+    Sometimes in may be userfull not to execute ansible playbook on hosts where
+    you haven't root permissions or coudn't even run setup module (ex: free
+    space troubles)
+
+    So this script group your hosts onto next groups:
+        - unreachable
+        - ping
+        - reachable
+        - best
+
+OPTIONS
+    inventory  -  inventory file
+    -l|--limit -  limit hosts or group as in ansible
+EOM
+
+SCRIPT=`realpath "$0"`
+
+while [[ "$#" -gt 0 ]]; do case "$1" in
+  -l=*|--limit=*) user_limit="$1"; shift;;
+  -l|--limit) user_limit="$2"; shift;;
+  -h|--help) echo "$HELP_MSG"; exit 0;;
+  -*) echo "Unknown parameter passed: $1"; echo -e "$HELP_MSG"; exit 1;;
+  *) inventory_file="$1"; shift;;
+esac; shift; done
+
+if [ ! -z $user_limit ]; then
+    limit="--limit=\"`echo "$user_limit" | sed -Ee 's/.*=(.*)/\1/'` localhost\""
+fi
+
+ansible-playbook -vvv "`dirname "$SCRIPT"`/heycheckyourrights.yml" -i "$inventory_file" $limit

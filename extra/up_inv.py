@@ -19,12 +19,13 @@ Input: up_inv.py <inventory> <hostname> <ping> <setup> <sudo>
 """
 
 def move_host(inv, host, block):
-    print(inv, host, block)
+    #  print(inv, host, block)
     with open(inv, 'r') as r:
         with open('tempfile', 'w') as w:
             cur_block = None
             host_not_found = True
-            writed = False
+            host_writed = False
+            file_changed = False
 
             for line in r:
                 block_match = re.match(r'\[(.*)\]', line)
@@ -33,7 +34,8 @@ def move_host(inv, host, block):
                     # добавляем в конец блока
                     if cur_block == block and host_not_found:
                         w.write(host+'\n')
-                        writed = True
+                        host_writed = True
+                        file_changed = True
 
                     cur_block = block_match.group(1)
                     w.write(line)
@@ -43,29 +45,31 @@ def move_host(inv, host, block):
                 if host_match:
                     if cur_block == block:
                         host_not_found = False
-                        writed = True
-                    else:
-                        # Не вставлять хост если не тот блок из
-                        # зарезирвированных
-                        if cur_block in ['unreachable', 'ping', 'reachable',
-                                         'best']:
-                            continue
+                        host_writed = True
+                    elif cur_block in ['unreachable', 'ping', 'reachable', 'best']:
+                        # Не вставлять хост если не тот блок из зарезирвированных
+                        file_changed = True
+                        continue
 
                 w.write(line)
 
-            if not writed:
+            if not host_writed:
                 # Если прошли весь файл и не нашли нужный блок, то нужно его
                 # добавить
                 if cur_block != block:
                     w.write('['+block+']\n')
                 w.write(host+'\n')
-                writed = True
+                host_writed = True
+                file_changed = True
 
     shutil.move('tempfile', inv)
 
+    if file_changed:
+        print('changed')
+
 
 def main():
-    print(sys.argv)
+    #  print(sys.argv)
 
     inv = sys.argv[1]
     host = sys.argv[2]

@@ -50,7 +50,7 @@ g.example.com
 
 After command 
 ```
-ansible-playbook -i /tmp/inv heycheckyourrights.yml --limit "localhost mygroup g.example.com"
+ansible-playbook -i inv --limit "localhost mygroup g.example.com"
 ```
 
 Result:

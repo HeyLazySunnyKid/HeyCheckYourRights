@@ -2,17 +2,19 @@
 - hosts: all
   gather_facts: false
   tasks:
+    - set_fact:
+        reachable: false
+        admin_user: false
+        available: false
+
     - delegate_to: localhost
       command: ping -c1 "{{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}"
       register: ping
       ignore_errors: true
+      changed_when: false
 
     - set_fact:
         available: "{{ ping.rc == 0 }}"
-
-    - set_fact:
-        reachable: false
-        admin_user: false
 
     - setup:
       when: ping.rc == 0
@@ -25,6 +27,7 @@
       command: sudo -n true
       register: ss
       ignore_errors: true
+      changed_when: false
       when: ping.rc == 0
 
     - set_fact:
@@ -36,6 +39,8 @@
   tasks:
     - name: update host place in inventory file
       command: "python3 extra/up_inv.py {{ hostvars[item].inventory_file }} {{ item }} {{ hostvars[item].available }} {{ hostvars[item].reachable }} {{ hostvars[item].admin_user }}"
+      register: update
+      changed_when: update.stdout == 'changed'
       when: hostvars[item].available is defined and hostvars[item].reachable is defined
       loop: "{{ groups.all }}"
       loop_control:
