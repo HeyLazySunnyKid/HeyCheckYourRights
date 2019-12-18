@@ -35,4 +35,4 @@ if [ ! -z $user_limit ]; then
 fi
 
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook -vvv "`dirname "$SCRIPT"`/heycheckyourrights.yml" -i "$inventory_file" $limit
+ansible-playbook "`dirname "$SCRIPT"`/heycheckyourrights.yml" -i "$inventory_file" $limit
