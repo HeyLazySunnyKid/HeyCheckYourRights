@@ -20,19 +20,16 @@ OPTIONS
     -l|--limit -  limit hosts or group as in ansible
 EOM
 
-SCRIPT=`realpath "$0"`
+PKGPATH="$( cd "$(dirname "$0")/../" >/dev/null 2>&1 ; pwd -P )"
 
 while [[ "$#" -gt 0 ]]; do case "$1" in
-  -l=*|--limit=*) user_limit="$1"; shift;;
-  -l|--limit) user_limit="$2"; shift;;
+  -l=*|--limit=*) limit="$1"; shift;;
+  -l|--limit) limit="--limit=$2"; shift;;
   -h|--help) echo "$HELP_MSG"; exit 0;;
   -*) echo "Unknown parameter passed: $1"; echo -e "$HELP_MSG"; exit 1;;
-  *) inventory_file="$1"; shift;;
+  *) inventory_file="$1";
 esac; shift; done
 
-if [ ! -z $user_limit ]; then
-    limit="--limit=\"`echo "$user_limit" | sed -Ee 's/.*=(.*)/\1/'` localhost\""
-fi
-
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook "`dirname "$SCRIPT"`/heycheckyourrights.yml" -i "$inventory_file" $limit
+export ANSIBLE_CONFIG="$PKGPATH/ansible.cfg"
+ansible-playbook "$PKGPATH/extra/heycheckyourrights.yml" -i "$inventory_file" "$limit"

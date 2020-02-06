@@ -1,0 +1,31 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    # Check ping host
+    - delegate_to: localhost
+      command: ping -c1 "{{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}"
+      register: ping
+      ignore_errors: true
+      changed_when: false
+
+    - set_fact:
+        available: "{{ ping.rc == 0 }}"
+
+    # Check that we can get facts about host
+    - setup:
+      ignore_errors: true
+      changed_when: false
+      when: ping.rc == 0
+
+    - set_fact:
+        reachable: true
+      when: ping.rc == 0
+
+    # Check sudo rights
+    - name: run sudo -n true
+      command: sudo -n true
+      register: ss
+      ignore_errors: true
+      changed_when: false
+      when: ping.rc == 0

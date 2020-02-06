@@ -3,6 +3,7 @@
 import sys
 import re
 import shutil
+import os
 
 """
 Вспомогательный скрипт для переноса хоста из одной инвентори группы в другую в
@@ -19,8 +20,8 @@ Input: up_inv.py <inventory> <hostname> <ping> <setup> <sudo>
 """
 
 def move_host(inv, host, block):
-    #  print(inv, host, block)
-    with open(inv, 'r') as r:
+    mode = 'r' if os.path.exists(inv) else 'w+'
+    with open(inv, mode) as r:
         with open('tempfile', 'w') as w:
             cur_block = None
             host_not_found = True
