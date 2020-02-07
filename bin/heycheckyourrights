@@ -1,35 +1,25 @@
 #!/bin/bash
 
 read -r -d '' HELP_MSG <<- EOM
-heycheckyourrights [inventory] [--limit group]
+heycheckyourrights [-h] [ansible-playbook options]
 
 DESCRIPTION
-    heycheckyourrights is a program for groups hosts in your inventory files.
-    Sometimes in may be userfull not to execute ansible playbook on hosts where
-    you haven't root permissions or coudn't even run setup module (ex: free
-    space troubles)
+    heycheckyourrights - script for checking rights for user using ansible.
+                        it support all ansible-playbook options
 
-    So this script group your hosts onto next groups:
-        - unreachable
-        - ping
-        - reachable
-        - best
-
-OPTIONS
-    inventory  -  inventory file
-    -l|--limit -  limit hosts or group as in ansible
+TAGS
+    ping - check only ping
+    access - check ssh access rights
+    sudo - check sudo rights
 EOM
 
 PKGPATH="$( cd "$(dirname "$0")/../" >/dev/null 2>&1 ; pwd -P )"
 
 while [[ "$#" -gt 0 ]]; do case "$1" in
-  -l=*|--limit=*) limit="$1"; shift;;
-  -l|--limit) limit="--limit=$2"; shift;;
   -h|--help) echo "$HELP_MSG"; exit 0;;
-  -*) echo "Unknown parameter passed: $1"; echo -e "$HELP_MSG"; exit 1;;
-  *) inventory_file="$1";
+  *) break;
 esac; shift; done
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 export ANSIBLE_CONFIG="$PKGPATH/ansible.cfg"
-ansible-playbook "$PKGPATH/extra/heycheckyourrights.yml" -i "$inventory_file" "$limit"
+ansible-playbook "$PKGPATH/extra/heycheckyourrights.yml" $@
