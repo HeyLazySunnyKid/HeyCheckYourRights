@@ -1,5 +1,5 @@
 # HeyCheckYourRights
-Check rights of your hosts from ansible inventory and show errors on them.
+Little script that helps to check rights (ping, access, sudo) from your hosts to hosts from ansible inventory. 
 
 ## Requirements
 - python3
