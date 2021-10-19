@@ -12,6 +12,7 @@ git clone https://github.com/HeyLazySunnyKid/HeyCheckYourRights.git
 # This is just bash script in bin directory.
 export PATH=$PATH:`pwd`/bin
 heycheckyourrights --help # read help message
+```
 
 ### Examples
 
